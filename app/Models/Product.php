@@ -24,25 +24,32 @@ class Product extends Model
 
     const PER_PAGE = 10;
 
-    
+
     public function scopeFilterBy($query, $filter_by)
     {
-        if($filter_by && in_array( ucfirst($filter_by),['Active' , 'Disable'] )){
+        if ($filter_by && in_array(ucfirst($filter_by), ['Active', 'Disable'])) {
             return $query->where('status', $filter_by);
         }
-      
+
         return $query;
     }
 
-    public function scopeOrderByColumn($query, $sort_by, $sort_order){
 
-        if( in_array( strtolower($sort_by), array_merge(['id'], $this->fillable) )){
-            return $query->orderBy($sort_by, $sort_order);
+    public function scopeOrderByColumn($query, $sort_by, $sort_order)
+    {
+        if (in_array(strtolower($sort_by), array_merge(['id'], $this->fillable))) {
+            if (strtolower($sort_by) == 'id') {
+                return $query->orderBy($sort_by, $sort_order);
+            } else {
+                return $query->when(strtolower($sort_order) == 'asc', function ($query) use ($sort_by) {
+                    return $query->orderBy($sort_by);
+                })->when(strtolower($sort_order) == 'desc', function ($query) use ($sort_by) {
+                    return $query->orderByDesc($sort_by);
+                });
+            }
         }
-      
         return $query;
     }
-
 
 
 }

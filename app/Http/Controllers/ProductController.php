@@ -10,7 +10,8 @@ use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
-    
+
+
     public function index(PaginateRequest $request, ProductServices $productServices)
     {
         $result = $productServices->getProducts($request);
