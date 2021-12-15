@@ -9,7 +9,7 @@ class ProductFactory extends Factory
 {
 
 
-    protected $model = Product::class; 
+    protected $model = Product::class;
 
     /**
      * Define the model's default state.
@@ -22,7 +22,7 @@ class ProductFactory extends Factory
             'default_name' => $this->faker->word(),
             'custom_name' => $this->faker->name(),
             'description' => $this->faker->paragraph(),
-            'status' => $this->faker->randomElement(['Active', 'Disable']),
+            'status' => $this->faker->randomElement(Product::STATUS),
             'created_at' => now(),
             'updated_at' => now(),
         ];

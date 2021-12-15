@@ -23,11 +23,12 @@ class Product extends Model
     ];
 
     const PER_PAGE = 10;
+    const STATUS = ['Active', 'Disable'];
 
 
     public function scopeFilterBy($query, $filter_by)
     {
-        if ($filter_by && in_array(ucfirst($filter_by), ['Active', 'Disable'])) {
+        if ($filter_by && in_array(ucfirst($filter_by), self::STATUS)) {
             return $query->where('status', $filter_by);
         }
 
@@ -37,7 +38,7 @@ class Product extends Model
 
     public function scopeOrderByColumn($query, $sort_by, $sort_order)
     {
-        if (in_array(strtolower($sort_by), array_merge(['id'], $this->fillable))) {
+        if ( in_array(strtolower($sort_by), array_merge(['id'], $this->fillable)) ) {
             if (strtolower($sort_by) == 'id') {
                 return $query->orderBy($sort_by, $sort_order);
             } else {
