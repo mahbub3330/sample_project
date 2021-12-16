@@ -27,29 +27,21 @@ class ProductServices
 //            ->paginate($per_page, ['*'], 'page');
 
         $query = DB::table('products');
-        if ($filter_by){
+        if ($filter_by) {
             $query = $query->where('status', $filter_by);
         }
 
-        if ($param['search_text']){
-            $query = $query->where('default_name', 'like','%'. $param['search_text'] . '%');
+        if ($param['search_text']) {
+            $query = $query->where('default_name', 'like', '%' . $param['search_text'] . '%');
         }
 
-        if (in_array($sort_by, array_merge(['id'], $fillable))){
+        if (in_array($sort_by, array_merge(['id'], $fillable))) {
             $query = $query->orderBy($sort_by, $sort_order);
         }
 
-        $productsObject = $query->paginate($per_page, ['*'], 'page');
-        return $this->formatProducts($productsObject->toArray());
+        $productsObject = $query->paginate($per_page);
+        return $this->formatPaginationInfo($productsObject->toArray());
     }
 
-    public function formatProducts($paginationObject): array
-    {
-        return [
-            'data' => $paginationObject['data'],
-            'info' => $this->formatPaginationInfo($paginationObject)
-        ];
-
-    }
 
 }
