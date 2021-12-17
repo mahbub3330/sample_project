@@ -21,3 +21,4 @@ Route::get('/', function () {
 
 Route::get('/products', [ProductController::class, 'index'])->name('products');
 
+Route::get('/fetch-data-for-input-1',[\App\Http\Controllers\FetchOutputController::class, 'fetchDataForInput1']);
