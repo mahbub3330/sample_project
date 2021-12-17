@@ -9,6 +9,7 @@ class FetchOutputController extends Controller
 {
     const API_NAME_PREFIX = [
         'property_name' => 'properties',
+        'property_address' => 'properties',
         'tenure_id' => 't',
         'property_category_id' => 'pc',
         'building_class_id' => 'bc'
@@ -20,68 +21,63 @@ class FetchOutputController extends Controller
         'building_class_id' => 'building_class_name',
     ];
 
-    public function fetchDataForInput1()
+
+    public function fetchDataForInput(): string
     {
-        $input1 = Storage::disk('public')->get('first_input.json');
-        $data = json_decode($input1)[0];
-        $output = '';
-        foreach ($data as $key => $item) {
-            if (is_array($item)) {
-                $output .= '(';
-                foreach ($item as $arrayKey => $arrayItem) {
-                    $output .= '(';
-                    if (is_array($arrayItem)) {
-                        foreach ($arrayItem as $arrayItemKey => $finalItem) {
-                            $output .= '(';
-                            if (is_array($finalItem)) {
-                                foreach ($finalItem as $itemIndex => $itemIndexValue) {
-                                    if (is_object($itemIndexValue)) {
-                                        $api_name_prefix = self::API_NAME_PREFIX[$itemIndexValue->api_name];
-                                        $api_name = self::API_NAME[$itemIndexValue->api_name] ?? $itemIndexValue->api_name;
-
-                                        $output .= $api_name_prefix . '.'  . $api_name . ' ' . $itemIndexValue->comparator;
-                                    }
-
-                                    if (is_string(($itemIndexValue)))
-                                    {
-                                        $output .=  ' ' .$itemIndexValue . ' ';
-                                    }
-
-                                }
-                            }
-                            $output .= ')';
-
-                        }
-                    }
-                    if (is_object($arrayItem)) {
-                        $api_name_prefix = self::API_NAME_PREFIX[$arrayItem->api_name];
-                        $api_name = self::API_NAME[$arrayItem->api_name] ?? $arrayItem->api_name;
-
-                        $output .= $api_name_prefix . '.'  . $api_name . ' ' . $arrayItem->comparator;
-                    }
-
-                    if (is_string(($arrayItem)))
-                    {
-                        $output .=  ' ' .$arrayItem . ' ';
-                    }
-                    $output .= ')';
-                }
-            }
-            if (is_object($item)) {
-                $api_name_prefix = self::API_NAME_PREFIX[$item->api_name];
-                $api_name = self::API_NAME[$item->api_name] ?? $item->api_name;
-
-                $output .= $api_name_prefix . '.'  . $api_name . ' ' . $item->comparator;
-            }
-
-            if (is_string(($item)))
-            {
-                $output .=  ' ' .$item . ' ';
-            }
-            $output .= ')';
+        if (request('input')) {
+            $input1 = Storage::disk('public')->get('first_input.json');
+            $data = json_decode($input1);
+        } else {
+            $input = Storage::disk('public')->get('second_input.json');
+            $data = json_decode($input);
         }
 
-        return response()->json($output);
+        $data = collect($data)->collapse();
+
+        $output = '(';
+
+        foreach ($data as $index => $item) {
+            if (is_array($item)) {
+                $this->formatArrayValue($item, $output);
+            }
+            $output = $this->getString($item, $output);
+        }
+
+        $output .= ')';
+
+        return $output;
+
+    }
+
+    public function formatArrayValue($arrayItems, &$output): string
+    {
+        $output .= '(';
+        foreach ($arrayItems as $arrayIndex => $item) {
+            $output = $this->getString($item, $output);
+            if (is_array($item)) {
+                $this->formatArrayValue($item, $output);
+            }
+
+        }
+        $output .= ')';
+
+        return $output;
+    }
+
+
+    public function getString($item, string $output): string
+    {
+        if (is_string($item)) {
+            $output .= ' ' . $item . ' ';
+        }
+        if (is_object($item)) {
+            $api_name_prefix = self::API_NAME_PREFIX[$item->api_name] ?? $item->api_name;
+            $api_name = self::API_NAME[$item->api_name] ?? $item->api_name;
+            $value = $item->comparator == 'contains' ? ' ' . '\'%' . $item->value . '%\'' : '';
+
+            $output .= $api_name_prefix . '.' . $api_name . ' ' . $item->comparator . $value;
+        }
+        return $output;
     }
 
 

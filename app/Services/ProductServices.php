@@ -26,13 +26,19 @@ class ProductServices
 //            ->orderByColumn($param['sort_by'] ?? 'id', $sort_order)
 //            ->paginate($per_page, ['*'], 'page');
 
-        $query = DB::table('products');
+        $fields = $param['field'] ?? [];
+
+        dd((new Product())->getTable());
+
+        $query = DB::table((new Product())->getTable());
         if ($filter_by) {
             $query = $query->where('status', $filter_by);
         }
 
         if ($param['search_text']) {
-            $query = $query->where('default_name', 'like', '%' . $param['search_text'] . '%');
+//            $query = $query->where('default_name', 'like', '%' . $param['search_text'] . '%');
+            $search = '%' . $param['search_text'] . '%';
+            $query = $query->where('default_name', 'like', );
         }
 
         if (in_array($sort_by, array_merge(['id'], $fillable))) {
@@ -41,6 +47,13 @@ class ProductServices
 
         $productsObject = $query->paginate($per_page);
         return $this->formatPaginationInfo($productsObject->toArray());
+    }
+
+    public function dynamicFieldSearch($fields, $query, $search)
+    {
+        foreach($fields as $field){
+            $dataQuery = $query->addSelect($field);
+        }
     }
 
 

@@ -22,6 +22,8 @@ class Product extends Model
         'status',
     ];
 
+    protected $table = 'products';
+
     const PER_PAGE = 10;
     const STATUS = ['Active', 'Disable'];
 
