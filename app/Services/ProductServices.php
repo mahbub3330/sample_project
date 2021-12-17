@@ -10,7 +10,7 @@ class ProductServices
 {
     use PaginationInfoTrait;
 
-    public function getProducts($param)
+    public function getProducts($param, FormatterInterface $formatter)
     {
 
         $per_page = $param['per_page'] ?? Product::PER_PAGE;
@@ -21,14 +21,13 @@ class ProductServices
         $fillable = (new Product())->getFillable();
 
 //        $productsObject = Product::query()
-//            ->filterBy(strtolower($param['filter_by'] ?? ''))
+//            ->filterBy('status', strtolower($param['filter_by'] ?? ''))
 //            ->where('default_name', 'LIKE', '%' . $param['search_text'] . '%')
 //            ->orderByColumn($param['sort_by'] ?? 'id', $sort_order)
-//            ->paginate($per_page, ['*'], 'page');
+//            ->paginate($per_page);
 
-        $fields = $param['field'] ?? [];
+        $fields = $param['fields'] ?? [];
 
-        dd((new Product())->getTable());
 
         $query = DB::table((new Product())->getTable());
         if ($filter_by) {
@@ -36,9 +35,7 @@ class ProductServices
         }
 
         if ($param['search_text']) {
-//            $query = $query->where('default_name', 'like', '%' . $param['search_text'] . '%');
-            $search = '%' . $param['search_text'] . '%';
-            $query = $query->where('default_name', 'like', );
+            $query = $this->dynamicFieldSearch($query, $fields, $param['search_text']);
         }
 
         if (in_array($sort_by, array_merge(['id'], $fillable))) {
@@ -46,14 +43,21 @@ class ProductServices
         }
 
         $productsObject = $query->paginate($per_page);
-        return $this->formatPaginationInfo($productsObject->toArray());
+        return $formatter->format($productsObject->toArray());
     }
 
     public function dynamicFieldSearch($fields, $query, $search)
     {
-        foreach($fields as $field){
-            $dataQuery = $query->addSelect($field);
+        $search = '%' . $search . '%';
+        foreach ($fields as $index => $field) {
+            if ($index == 0) {
+                $query = $query->where($field, 'LIKE', $search);
+            } else {
+                $query = $query->orWhere($field, 'LIKE', $search);
+            }
         }
+
+        return $query;
     }
 
 

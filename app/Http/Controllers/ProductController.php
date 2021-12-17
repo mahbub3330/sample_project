@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PaginateRequest;
 use App\Models\Product;
+use App\Services\PaginateFormatter;
 use App\Services\ProductServices;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -14,7 +15,7 @@ class ProductController extends Controller
 
     public function index(PaginateRequest $request, ProductServices $productServices)
     {
-        $result = $productServices->getProducts($request);
+        $result = $productServices->getProducts($request, new PaginateFormatter);
         return response()->json($result, 200);
     }
 

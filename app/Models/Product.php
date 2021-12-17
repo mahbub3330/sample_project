@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
-
+use App\Services\FilterTrait;
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, FilterTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -26,17 +26,6 @@ class Product extends Model
 
     const PER_PAGE = 10;
     const STATUS = ['Active', 'Disable'];
-
-
-    public function scopeFilterBy($query, $filter_by)
-    {
-        if ($filter_by && in_array(ucfirst($filter_by), self::STATUS)) {
-            return $query->where('status', $filter_by);
-        }
-
-        return $query;
-    }
-
 
     public function scopeOrderByColumn($query, $sort_by, $sort_order)
     {
