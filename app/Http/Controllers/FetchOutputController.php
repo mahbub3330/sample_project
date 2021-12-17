@@ -24,7 +24,7 @@ class FetchOutputController extends Controller
 
     public function fetchDataForInput(): string
     {
-        if (request('input')) {
+        if (request('input') == 1) {
             $input1 = Storage::disk('public')->get('first_input.json');
             $data = json_decode($input1);
         } else {
