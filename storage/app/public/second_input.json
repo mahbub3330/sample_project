@@ -1,0 +1,35 @@
+[
+    [
+        [
+            {
+                "api_name": "property_name",
+                "comparator": "contains",
+                "value": "Road Side",
+                "data_type": "string"
+            },
+            "or",
+            {
+                "api_name": "property_address",
+                "comparator": "is empty",
+                "value": "empty",
+                "data_type": "string"
+            }
+        ],
+        "and",
+        [
+            {
+                "api_name": "property_category_id",
+                "comparator": "is not empty",
+                "value": "notempty",
+                "data_type": "lookup"
+            },
+            "or",
+            {
+                "api_name": "building_class_id",
+                "comparator": "is not empty",
+                "value": "notempty",
+                "data_type": "lookup"
+            }
+        ]
+    ]
+]
