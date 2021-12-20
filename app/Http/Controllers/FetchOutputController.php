@@ -21,8 +21,6 @@ class FetchOutputController extends Controller
 
         $data = collect($data)->collapse();
 
-
-
         return FormatOutputService::formatData($data);
 
     }
