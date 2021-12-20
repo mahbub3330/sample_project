@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Models\ScheduleOption;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
@@ -17,10 +18,15 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
-        $schedule->call(function () use ($schedule) {
-            DB::table('products')->delete(5);
+        $interval = DB::table((new ScheduleOption())->getTable())->first()->interval_option ?? 1;
+        $expression = '*/' . $interval . ' * * * *';
 
-        })->everyMinute();
+        $schedule->command('schedule:test')->cron($expression);
+
+
+//        $schedule->call(function () use ($interval){
+//            info("called finally after" . $interval . " times");
+//        })->cron($expression);
     }
 
     /**

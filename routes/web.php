@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ScheduleOptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
@@ -22,3 +23,5 @@ Route::get('/', function () {
 Route::get('/products', [ProductController::class, 'index'])->name('products');
 
 Route::get('/fetch-data-for-input',[\App\Http\Controllers\FetchOutputController::class, 'fetchDataForInput']);
+Route::resource('schedule-option', ScheduleOptionController::class);
+
